@@ -10,5 +10,5 @@ MFA的算法
 
 <img width="318" alt="demo_phone" src="https://github.com/user-attachments/assets/bb26e550-ed04-43ee-98ea-373bfe1bfe74" />  
 
-![demo_pc](https://github.com/user-attachments/assets/0b8509f3-a860-407f-81a2-09cc12951e4c)
 
+![demo_pc](https://github.com/user-attachments/assets/92cdb754-fbc2-42e3-af21-a13d80b90014)
