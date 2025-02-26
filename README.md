@@ -7,3 +7,7 @@ MFA的算法
 阿里云的MFA验证基于TOTP（Time-Based One-Time Password，基于时间的一次性密码）协议，这是一种广泛采用的多因素认证协议。TOTP算法是公开的，其核心原理是通过共享密钥和当前时间生成动态验证码
 
 以后版本可以移植到STM32等单片机上...
+
+![demo_pc](https://github.com/user-attachments/assets/5f3e50a3-846c-4455-b413-58d23e6aec1c)
+
+<img width="318" alt="demo_phone" src="https://github.com/user-attachments/assets/bb26e550-ed04-43ee-98ea-373bfe1bfe74" />
