@@ -1,4 +1,4 @@
-// »ùÓÚTOTPÊµÏÖ°¢ÀïMFAÑéÖ¤.cpp : Defines the entry point for the console application.
+// åŸºäºTOTPå®ç°é˜¿é‡ŒMFAéªŒè¯.cpp : Defines the entry point for the console application.
 //
 
 #include "stdafx.h"
@@ -7,14 +7,14 @@
 #include <stdint.h>
 #include <string.h>
 #include <time.h>
-#include <openssl/hmac.h> // OpenSSL HMACº¯Êı
+#include <openssl/hmac.h> // OpenSSL HMACå‡½æ•°
 
 #pragma comment(lib, "libcrypto.lib")
 
 #pragma comment(lib, "ws2_32")
 #pragma comment(lib, "Crypt32")
 
-// Base32½âÂë±í£¨RFC4648±ê×¼£©
+// Base32è§£ç è¡¨ï¼ˆRFC4648æ ‡å‡†ï¼‰
 static const char base32_table[] = {
     'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H',
     'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
@@ -23,17 +23,17 @@ static const char base32_table[] = {
 };
 
 /**
- * Base32½âÂëº¯Êı
- * @param encoded ÊäÈëBase32×Ö·û´®
- * @param result Êä³ö×Ö½ÚÊı×é
- * @return ½âÂëºóµÄ×Ö½ÚÊı£¬-1±íÊ¾´íÎó
+ * Base32è§£ç å‡½æ•°
+ * @param encoded è¾“å…¥Base32å­—ç¬¦ä¸²
+ * @param result è¾“å‡ºå­—èŠ‚æ•°ç»„
+ * @return è§£ç åçš„å­—èŠ‚æ•°ï¼Œ-1è¡¨ç¤ºé”™è¯¯
  */
 int base32_decode(const char *encoded, uint8_t *result) {
     int buffer = 0, bits = 0, count = 0;
     for (const char *p = encoded; *p; ++p) {
-        if (*p == '=') break; // ºöÂÔÌî³ä·û
+        if (*p == '=') break; // å¿½ç•¥å¡«å……ç¬¦
         const char *c = strchr(base32_table, *p);
-        if (!c) return -1;    // ·Ç·¨×Ö·û
+        if (!c) return -1;    // éæ³•å­—ç¬¦
         
         buffer = (buffer << 5) | (c - base32_table);
         bits += 5;
@@ -46,50 +46,50 @@ int base32_decode(const char *encoded, uint8_t *result) {
 }
 
 /**
- * Éú³ÉTOTPÂë£¨6Î»£©
- * @param secret Base32±àÂëµÄÃÜÔ¿
- * @return 6Î»¶¯Ì¬ÃÜÂë×Ö·û´®
+ * ç”ŸæˆTOTPç ï¼ˆ6ä½ï¼‰
+ * @param secret Base32ç¼–ç çš„å¯†é’¥
+ * @return 6ä½åŠ¨æ€å¯†ç å­—ç¬¦ä¸²
  */
 char* generate_totp(const char *secret) {
-    uint8_t key[20]; // ½âÂëºóµÄÃÜÔ¿
+    uint8_t key[200]; // è§£ç åçš„å¯†é’¥
     int key_len = base32_decode(secret, key);
     if (key_len < 0) return NULL;
 
-    // »ñÈ¡µ±Ç°Ê±¼ä´Á£¨30ÃëÎªÒ»¸öÊ±¼ä´°¿Ú£©
+    // è·å–å½“å‰æ—¶é—´æˆ³ï¼ˆ30ç§’ä¸ºä¸€ä¸ªæ—¶é—´çª—å£ï¼‰
     time_t timestamp = time(NULL);
     uint64_t time_step = (uint64_t)timestamp / 30;
 
-    // ½«Ê±¼ä²½³¤×ª»»Îª´ó¶Ë×Ö½ÚĞò
+    // å°†æ—¶é—´æ­¥é•¿è½¬æ¢ä¸ºå¤§ç«¯å­—èŠ‚åº
     uint8_t msg[8];
     for (int i = 7; i >= 0; --i) {
         msg[i] = time_step & 0xFF;
         time_step >>= 8;
     }
 
-    // Ê¹ÓÃOpenSSL¼ÆËãHMAC-SHA1
-    uint8_t hash[20];
+    // ä½¿ç”¨OpenSSLè®¡ç®—HMAC-SHA1
+    uint8_t hash[200];
     unsigned int hash_len;
     HMAC(EVP_sha1(), key, key_len, msg, 8, hash, &hash_len);
 
-    // ¶¯Ì¬½Ø¶Ï£¨DTËã·¨£©
+    // åŠ¨æ€æˆªæ–­ï¼ˆDTç®—æ³•ï¼‰
     int offset = hash[19] & 0x0F;
     uint32_t code = (hash[offset] & 0x7F) << 24 |
                     (hash[offset+1] & 0xFF) << 16 |
                     (hash[offset+2] & 0xFF) << 8 |
                     (hash[offset+3] & 0xFF);
 
-    // Éú³É6Î»Êı×Ö
+    // ç”Ÿæˆ6ä½æ•°å­—
     static char otp[7];
     _snprintf_s(otp, sizeof(otp), "%06d", code % 1000000);
     return otp;
 }
 
-// Ê¾ÀıÓÃ·¨
+// ç¤ºä¾‹ç”¨æ³•
 int main()
 {
 	while(true)
 	{
-		const char *secret = "JBSWY3DPEHPK3PXP"; // Ê¾ÀıÃÜÔ¿£¨Base32±àÂë£©
+		const char *secret = "JBSWY3DPEHPK3PXP"; // ç¤ºä¾‹å¯†é’¥ï¼ˆBase32ç¼–ç ï¼‰
 		char *code = generate_totp(secret);
 		printf("Current TOTP: %s\n", code);
 		system("pause");
